@@ -8,13 +8,14 @@ import {
   getHarberger,
   changeString,
   web3,
+  getIssuer,
 } from './utils/interact'
 
 const Minter = (props) => {
   //State variables
   const [walletAddress, setWallet] = useState('')
   const [status, setStatus] = useState('')
-  // const [harberger, setHarberger] = useState('');
+  const [issuer, setIssuer] = useState('')
   const [owner, setOwner] = useState('')
   const [ownershipPeriod, setOwnershipPeriod] = useState(0)
   const [harbergerHike, setHarbergerHike] = useState(0)
@@ -23,15 +24,17 @@ const Minter = (props) => {
   const [userSettledPrice, setUserSettledPrice] = useState(100)
   const [valueOfString, setValueOfString] = useState('')
 
-  const [isOwnerOfHarberger, setOwnerOfHarberger] = useState(false)
 
   useEffect(async () => {
     //TODO: implement
     const { address, status } = await getCurrentWalletConnected()
     const harbergerInfo = await getHarberger()
+    const issuerAddress = await getIssuer()
 
     setWallet(address)
     setStatus(status)
+    setIssuer(issuerAddress.status)
+
     setOwner(harbergerInfo.status.owner)
     setOwnershipPeriod(harbergerInfo.status.ownershipPeriod)
     setHarbergerHike(harbergerInfo.status.harbergerHike)
@@ -112,17 +115,51 @@ const Minter = (props) => {
       <h1 id="title">🧙‍♂️ Harberger-taxed Test</h1>
       <p>Simply add your settled price, then press "Buy"</p>
       <form>
-        <h2>⏲ Harberger Duration Period: </h2>
-        <input type="text" value={ownershipPeriod} readOnly />
-        <h2>🏦 Harberger Hike: </h2>
-        <input type="text" value={harbergerHike} readOnly />
-        <h2>🤑 Harberger Tax: </h2>
-        <input type="text" value={harbergerTax} readOnly />
-        <h2>🤔 Initial Price: </h2>
-        <div style={{ display: 'flex' }}>
-          <input type="text" value={initialPrice} readOnly />
-          <div style={{ paddingTop: '17px' }}>tokens</div>
-        </div>
+        {issuer.toLowerCase() == walletAddress.toLowerCase() ? (
+          <div>
+            <h2>⏲ Harberger Duration Period: </h2>
+            <input
+              type="text"
+              value={ownershipPeriod}
+              onChange={(event) => setOwnershipPeriod(event.target.value)}
+            />
+            <h2>🏦 Harberger Hike: </h2>
+            <input
+              type="text"
+              value={harbergerHike}
+              onChange={(event) => setHarbergerHike(event.target.value)}
+            />
+            <h2>🤑 Harberger Tax: </h2>
+            <input
+              type="text"
+              value={harbergerTax}
+              onChange={(event) => setHarbergerTax(event.target.value)}
+            />
+            <h2>🤔 Initial Price: </h2>
+            <div style={{ display: 'flex' }}>
+              <input
+                type="text"
+                value={initialPrice}
+                onChange={(event) => setInitialPrice(event.target.value)}
+              />
+              <div style={{ paddingTop: '17px' }}>tokens</div>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <h2>⏲ Harberger Duration Period: </h2>
+            <input type="text" value={ownershipPeriod} readOnly />
+            <h2>🏦 Harberger Hike: </h2>
+            <input type="text" value={harbergerHike} readOnly />
+            <h2>🤑 Harberger Tax: </h2>
+            <input type="text" value={harbergerTax} readOnly />
+            <h2>🤔 Initial Price: </h2>
+            <div style={{ display: 'flex' }}>
+              <input type="text" value={initialPrice} readOnly />
+              <div style={{ paddingTop: '17px' }}>tokens</div>
+            </div>
+          </div>
+        )}
         <h2>💰 User Settled Price: </h2>
         <div style={{ display: 'flex' }}>
           <input

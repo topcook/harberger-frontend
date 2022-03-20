@@ -225,13 +225,7 @@ export const getHarberger = async () => {
     //load smart contract
     window.contract = await new web3.eth.Contract(contractABI, contractAddress);//loadContract();
 
-    //set up your Ethereum transaction
-    const transactionParameters = {
-        to: contractAddress, // Required except during contract publications.
-        from: window.ethereum.selectedAddress, // must match user's active address.
-        'data': window.contract.methods.harbergerInfo().encodeABI()
-    };
-    
+   
     const harbergerInfo = await window.contract.methods.harbergerInfo().call();
     console.log("interact.js => harbergerInfo: ", harbergerInfo);
 
@@ -241,25 +235,17 @@ export const getHarberger = async () => {
     }
 }
 
-// export const getHarbergerHike = async () => {
-//     window.contract = await new web3.eth.Contract(contractABI, contractAddress);//loadContract();
-//     let harbergerHike;
-//     await window.contract.methods.getHarbergerHike().call()
-//     .then(res => {return res;});
-//     // console.log("harbergerhike: ", harbergerHike);
-//     // return harbergerHike;
-// }
+export const getIssuer = async () => {
+    console.log("getIssuer function called");
 
-// export const getHarbergerTax = async () => {
-//     window.contract = await new web3.eth.Contract(contractABI, contractAddress);//loadContract();
-//     const harbergerTax = window.contract.methods.getHarbergerTax().call();
-//     console.log("interact.js harbergerTax: ", harbergerTax);
-//     return harbergerTax;
-// }
+    //load smart contract
+    window.contract = await new web3.eth.Contract(contractABI, contractAddress);//loadContract();
+    
+    const issuerAddress = await window.contract.methods.getIssuer().call();
+    console.log("interact.js => issuerAddress: ", issuerAddress);
 
-// export const getHarbergerHike = async () => {
-//     window.contract = await new web3.eth.Contract(contractABI, contractAddress);//loadContract();
-//     const harbergerTax = window.contract.methods.getHarbergerTax().call();
-//     console.log("interact.js harbergerTax: ", harbergerTax);
-//     return harbergerTax;
-// }
+    return {
+        success: true,
+        status: issuerAddress
+    }
+}

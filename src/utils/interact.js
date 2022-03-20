@@ -6,6 +6,9 @@ export const web3 = createAlchemyWeb3(alchemyKey)
 const contractABI = require('../contract-abi.json')
 const contractAddress = '0x80c66Fb9ceE6df547809461AB7c3A5015413110d'
 
+const tokenABI = require('../Token-abi.json')
+const tokenAddress = '0x09AE949950905cDd9b07EF7ba866bBa9d31Dd0FB'
+
 export const connectWallet = async () => {
   if (window.ethereum) {
     const chainId = 3 // 3 for ropsten, 4 for rinkeby, 1 for mainnet
@@ -114,16 +117,6 @@ export const getCurrentWalletConnected = async () => {
 }
 
 export const buyHarberger = async (userSettledPrice) => {
-  // const user = parseFloat(userSettledPrice);
-
-  //error handling
-  // if (parseInt(userSettledPrice) < 110) {
-  //     return {
-  //         success: false,
-  //         status: "❗Please make sure user setteld price should be greater than 110.",
-  //     }
-  // }
-
   //load smart contract
   window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
 
@@ -159,6 +152,40 @@ export const buyHarberger = async (userSettledPrice) => {
     }
   }
 }
+
+export const approveToken = async () => {
+    //load smart contract
+  window.contract = await new web3.eth.Contract(tokenABI, tokenAddress) //loadContract();
+
+  //set up your Ethereum transaction
+  const transactionParameters = {
+    to: tokenAddress, // Required except during contract publications.
+    from: window.ethereum.selectedAddress, // must match user's active address.
+    data: window.contract.methods
+      .approve(
+        contractAddress,
+        web3.utils.toWei('1000', 'ether'),
+      )
+      .encodeABI(),
+  }
+
+  //sign transaction via Metamask
+  try {
+    const txHash = await window.ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [transactionParameters],
+    })
+    return {
+      success: true,
+      status: 'approve success',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      status: '😥 Something went wrong: ' + error.message,
+    }
+  }
+  }
 
 export const delayHarberger = async () => {
   //load smart contract

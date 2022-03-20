@@ -10,6 +10,7 @@ import {
   changeSettings,
   web3,
   getIssuer,
+  approveToken,
 } from './utils/interact'
 
 const Minter = (props) => {
@@ -36,6 +37,7 @@ const Minter = (props) => {
     setIssuer(issuerAddress.status)
 
     setOwner(harbergerInfo.status.owner)
+    console.log("owner:  ", harbergerInfo.status.owner)
     setOwnershipPeriod(harbergerInfo.status.ownershipPeriod / 30) // 30 for testnet, 24 * 60 * 60 for mainnet
     setHarbergerHike(harbergerInfo.status.harbergerHike)
     setHarbergerTax(harbergerInfo.status.harbergerTax)
@@ -82,6 +84,7 @@ const Minter = (props) => {
   const onBuyPressed = async () => {
     //TODO: implement
     //console.log('userSettledPrice')
+    const {approveStatus} = await approveToken()
     const { status } = await buyHarberger(userSettledPrice)
     setStatus(status)
   }

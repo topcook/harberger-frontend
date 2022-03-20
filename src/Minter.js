@@ -7,6 +7,7 @@ import {
   delayHarberger,
   getHarberger,
   changeString,
+  changeSettings,
   web3,
   getIssuer,
 } from './utils/interact'
@@ -24,7 +25,6 @@ const Minter = (props) => {
   const [userSettledPrice, setUserSettledPrice] = useState(100)
   const [valueOfString, setValueOfString] = useState('')
 
-
   useEffect(async () => {
     //TODO: implement
     const { address, status } = await getCurrentWalletConnected()
@@ -36,7 +36,7 @@ const Minter = (props) => {
     setIssuer(issuerAddress.status)
 
     setOwner(harbergerInfo.status.owner)
-    setOwnershipPeriod(harbergerInfo.status.ownershipPeriod)
+    setOwnershipPeriod(harbergerInfo.status.ownershipPeriod / 30) // 30 for testnet, 24 * 60 * 60 for mainnet
     setHarbergerHike(harbergerInfo.status.harbergerHike)
     setHarbergerTax(harbergerInfo.status.harbergerTax)
     setInitialPrice(
@@ -81,7 +81,7 @@ const Minter = (props) => {
 
   const onBuyPressed = async () => {
     //TODO: implement
-    console.log('userSettledPrice')
+    //console.log('userSettledPrice')
     const { status } = await buyHarberger(userSettledPrice)
     setStatus(status)
   }
@@ -92,9 +92,26 @@ const Minter = (props) => {
     setStatus(status)
   }
 
-  const onChangePressed = async () => {
+  const onChangeStringPressed = async () => {
     //TODO: implement
     const { status } = await changeString(valueOfString)
+    setStatus(status)
+  }
+
+  const onChangeSettingsPressed = async () => {
+    //TODO: implement
+    if (
+      issuer.toLowerCase() != owner.toLowerCase()
+    ) {
+      valueOfString = 'Owner is not issuer'
+    }
+    const { status } = await changeSettings(
+      ownershipPeriod,
+      harbergerHike,
+      harbergerTax,
+      initialPrice,
+      valueOfString,
+    )
     setStatus(status)
   }
 
@@ -118,11 +135,14 @@ const Minter = (props) => {
         {issuer.toLowerCase() == walletAddress.toLowerCase() ? (
           <div>
             <h2>⏲ Harberger Duration Period: </h2>
-            <input
-              type="text"
-              value={ownershipPeriod}
-              onChange={(event) => setOwnershipPeriod(event.target.value)}
-            />
+            <div style={{ display: 'flex' }}>
+              <input
+                type="text"
+                value={ownershipPeriod}
+                onChange={(event) => setOwnershipPeriod(event.target.value)}
+              />
+              <div style={{ paddingTop: '17px' }}>days</div>
+            </div>
             <h2>🏦 Harberger Hike: </h2>
             <input
               type="text"
@@ -148,7 +168,10 @@ const Minter = (props) => {
         ) : (
           <div>
             <h2>⏲ Harberger Duration Period: </h2>
-            <input type="text" value={ownershipPeriod} readOnly />
+            <div style={{ display: 'flex' }}>
+              <input type="text" value={ownershipPeriod} readOnly />
+              <div style={{ paddingTop: '17px' }}>days</div>
+            </div>
             <h2>🏦 Harberger Hike: </h2>
             <input type="text" value={harbergerHike} readOnly />
             <h2>🤑 Harberger Tax: </h2>
@@ -188,7 +211,7 @@ const Minter = (props) => {
       <button
         id="buyButton"
         className="contractButton"
-        style={{ marginRight: '50px' }}
+        style={{ marginRight: '40px' }}
         onClick={onBuyPressed}
       >
         Buy
@@ -196,18 +219,28 @@ const Minter = (props) => {
       <button
         id="delayButton"
         className="contractButton"
-        style={{ marginRight: '50px' }}
+        style={{ marginRight: '40px' }}
         onClick={onDelayPressed}
       >
         Delay Expire Time
       </button>
-      <button
-        id="changeButton"
-        className="contractButton"
-        onClick={onChangePressed}
-      >
-        Change string
-      </button>
+      {issuer.toLowerCase() == walletAddress.toLowerCase() ? (
+        <button
+          id="changeButton"
+          className="contractButton"
+          onClick={onChangeSettingsPressed}
+        >
+          Change settings
+        </button>
+      ) : (
+        <button
+          id="changeButton"
+          className="contractButton"
+          onClick={onChangeStringPressed}
+        >
+          Change string
+        </button>
+      )}
       <p id="status" style={{ paddingBottom: '100px' }}>
         {parse(status)}
       </p>

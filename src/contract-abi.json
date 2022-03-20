@@ -70,6 +70,12 @@
   },
   {
     "anonymous": false,
+    "inputs": [],
+    "name": "ValueOfSettingsChangedEvent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
     "inputs": [
       {
         "indexed": true,
@@ -332,6 +338,39 @@
       }
     ],
     "name": "setTokenAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "_ownershipPeriod",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint16",
+        "name": "_harbergerHike",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint16",
+        "name": "_harbergerTax",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_initialPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_valueOfString",
+        "type": "string"
+      }
+    ],
+    "name": "setValueOfSettings",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -1,66 +1,107 @@
-import { useEffect, useState } from "react";
-import { connectWallet, getCurrentWalletConnected, mintNFT } from "./utils/interact";
+import { useEffect, useState } from 'react'
+import parse from 'html-react-parser'
+import {
+  connectWallet,
+  getCurrentWalletConnected,
+  buyHarberger,
+  delayHarberger,
+  getHarberger,
+  changeString,
+  web3,
+} from './utils/interact'
 
 const Minter = (props) => {
-
   //State variables
-  const [walletAddress, setWallet] = useState("");
-  const [status, setStatus] = useState("");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [url, setURL] = useState("");
+  const [walletAddress, setWallet] = useState('')
+  const [status, setStatus] = useState('')
+  // const [harberger, setHarberger] = useState('');
+  const [owner, setOwner] = useState('')
+  const [ownershipPeriod, setOwnershipPeriod] = useState(0)
+  const [harbergerHike, setHarbergerHike] = useState(0)
+  const [harbergerTax, setHarbergerTax] = useState(0)
+  const [initialPrice, setInitialPrice] = useState(0)
+  const [userSettledPrice, setUserSettledPrice] = useState(100)
+  const [valueOfString, setValueOfString] = useState('')
 
-  useEffect(async () => { //TODO: implement
-    const { address, status } = await getCurrentWalletConnected();
+  const [isOwnerOfHarberger, setOwnerOfHarberger] = useState(false)
+
+  useEffect(async () => {
+    //TODO: implement
+    const { address, status } = await getCurrentWalletConnected()
+    const harbergerInfo = await getHarberger()
+
     setWallet(address)
-    setStatus(status);
+    setStatus(status)
+    setOwner(harbergerInfo.status.owner)
+    setOwnershipPeriod(harbergerInfo.status.ownershipPeriod)
+    setHarbergerHike(harbergerInfo.status.harbergerHike)
+    setHarbergerTax(harbergerInfo.status.harbergerTax)
+    setInitialPrice(
+      web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
+    )
+    setValueOfString(harbergerInfo.status.valueOfString)
 
-    addWalletListener();
-  }, []);
+    addWalletListener()
+  }, [])
 
-  const connectWalletPressed = async () => { //TODO: implement
-    const walletStatus = await connectWallet();
+  const connectWalletPressed = async () => {
+    //TODO: implement
+    const walletStatus = await connectWallet()
     setWallet(walletStatus.address)
-    setStatus(walletStatus.status);
-  };
+    setStatus(walletStatus.status)
+  }
 
   function addWalletListener() {
     if (window.ethereum) {
-      window.ethereum.on("accountsChanged", (accounts) => {
+      window.ethereum.on('accountsChanged', (accounts) => {
         if (accounts.length > 0) {
-          setWallet(accounts[0]);
-          setStatus("👆🏽 Write a message in the text-field above.");
+          setWallet(accounts[0])
+          // setStatus("👆🏽 Write a message in the text-field above.");
         } else {
-          setWallet("");
-          setStatus("🦊 Connect to Metamask using the top right button.");
+          setWallet('')
+          setStatus('🦊 Connect to Metamask using the top right button.')
         }
-      });
+      })
     } else {
       setStatus(
         <p>
-          {" "}
-          🦊{" "}
+          {' '}
+          🦊{' '}
           <a target="_blank" href={`https://metamask.io/download.html`}>
             You must install Metamask, a virtual Ethereum wallet, in your
             browser.
           </a>
-        </p>
-      );
+        </p>,
+      )
     }
   }
 
-  const onMintPressed = async () => { //TODO: implement
-    const { status } = await mintNFT(url, name, description);
-    setStatus(status);
-  };
+  const onBuyPressed = async () => {
+    //TODO: implement
+    console.log('userSettledPrice')
+    const { status } = await buyHarberger(userSettledPrice)
+    setStatus(status)
+  }
+
+  const onDelayPressed = async () => {
+    //TODO: implement
+    const { status } = await delayHarberger()
+    setStatus(status)
+  }
+
+  const onChangePressed = async () => {
+    //TODO: implement
+    const { status } = await changeString(valueOfString)
+    setStatus(status)
+  }
 
   return (
     <div className="Minter">
       <button id="walletButton" onClick={connectWalletPressed}>
         {walletAddress.length > 0 ? (
-          "Connected: " +
+          'Connected: ' +
           String(walletAddress).substring(0, 6) +
-          "..." +
+          '...' +
           String(walletAddress).substring(38)
         ) : (
           <span>Connect Wallet</span>
@@ -68,38 +109,73 @@ const Minter = (props) => {
       </button>
 
       <br></br>
-      <h1 id="title">🧙‍♂️ Alchemy NFT Minter</h1>
-      <p>
-        Simply add your asset's link, name, and description, then press "Mint."
-      </p>
+      <h1 id="title">🧙‍♂️ Harberger-taxed Test</h1>
+      <p>Simply add your settled price, then press "Buy"</p>
       <form>
-        <h2>🖼 Link to asset: </h2>
-        <input
-          type="text"
-          placeholder="e.g. https://gateway.pinata.cloud/ipfs/<hash>"
-          onChange={(event) => setURL(event.target.value)}
-        />
-        <h2>🤔 Name: </h2>
-        <input
-          type="text"
-          placeholder="e.g. My first NFT!"
-          onChange={(event) => setName(event.target.value)}
-        />
-        <h2>✍️ Description: </h2>
-        <input
-          type="text"
-          placeholder="e.g. Even cooler than cryptokitties ;)"
-          onChange={(event) => setDescription(event.target.value)}
-        />
+        <h2>⏲ Harberger Duration Period: </h2>
+        <input type="text" value={ownershipPeriod} readOnly />
+        <h2>🏦 Harberger Hike: </h2>
+        <input type="text" value={harbergerHike} readOnly />
+        <h2>🤑 Harberger Tax: </h2>
+        <input type="text" value={harbergerTax} readOnly />
+        <h2>🤔 Initial Price: </h2>
+        <div style={{ display: 'flex' }}>
+          <input type="text" value={initialPrice} readOnly />
+          <div style={{ paddingTop: '17px' }}>tokens</div>
+        </div>
+        <h2>💰 User Settled Price: </h2>
+        <div style={{ display: 'flex' }}>
+          <input
+            type="text"
+            value={userSettledPrice}
+            onChange={(event) => setUserSettledPrice(event.target.value)}
+          />
+          <div style={{ paddingTop: '17px' }}>tokens</div>
+        </div>
+        <h2>✍️ String: </h2>
+        {owner.toLowerCase() == walletAddress.toLowerCase() ? (
+          <input
+            type="text"
+            value={valueOfString}
+            onChange={(event) => setValueOfString(event.target.value)}
+          />
+        ) : (
+          <input
+            type="text"
+            value={valueOfString}
+            onChange={(event) => setValueOfString(event.target.value)}
+            readOnly
+          />
+        )}
       </form>
-      <button id="mintButton" onClick={onMintPressed}>
-        Mint NFT
+      <button
+        id="buyButton"
+        className="contractButton"
+        style={{ marginRight: '50px' }}
+        onClick={onBuyPressed}
+      >
+        Buy
       </button>
-      <p id="status">
-        {status}
+      <button
+        id="delayButton"
+        className="contractButton"
+        style={{ marginRight: '50px' }}
+        onClick={onDelayPressed}
+      >
+        Delay Expire Time
+      </button>
+      <button
+        id="changeButton"
+        className="contractButton"
+        onClick={onChangePressed}
+      >
+        Change string
+      </button>
+      <p id="status" style={{ paddingBottom: '100px' }}>
+        {parse(status)}
       </p>
     </div>
-  );
-};
+  )
+}
 
-export default Minter;
+export default Minter

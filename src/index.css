@@ -54,7 +54,7 @@ button {
 }
 
 #title {
-  padding-top: 32px;
+  padding-top: 60px;
 }
 
 #status {
@@ -75,7 +75,7 @@ button {
   line-height: 16px;
 }
 
-#mintButton {
+.contractButton {
   margin-top: 40px;
   background-color: #254cdd;
   color:white;

@@ -24,7 +24,7 @@ const Minter = (props) => {
   const [harbergerHike, setHarbergerHike] = useState(0)
   const [harbergerTax, setHarbergerTax] = useState(0)
   const [initialPrice, setInitialPrice] = useState(0)
-  const [userSettledPrice, setUserSettledPrice] = useState(100)
+  const [userSettledPrice, setUserSettledPrice] = useState(0)
   const [valueOfString, setValueOfString] = useState('')
   const [expireTimeOfCurrentOwner, setExpireTimeOfCurrentOwner] = useState(0)
   // const [currentTimeStamp, setCurrentTimeStamp] = useState(0)
@@ -48,9 +48,12 @@ const Minter = (props) => {
     setInitialPrice(
       web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
     )
+    setUserSettledPrice(
+      web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
+    )
     setValueOfString(harbergerInfo.status.valueOfString)
     setExpireTimeOfCurrentOwner(harbergerInfo.status.endTime)
-    console.log("", parseInt((new Date).getTime()/1000 ));
+    console.log('', parseInt(new Date().getTime() / 1000))
     // + (new Date).getTimezoneOffset() * 60
 
     addWalletListener()
@@ -201,8 +204,10 @@ const Minter = (props) => {
           <div style={{ paddingTop: '17px' }}>tokens</div>
         </div>
         <h2>✍️ String: </h2>
-        {(owner.toLowerCase() == walletAddress.toLowerCase() && parseInt((new Date).getTime()/1000) < expireTimeOfCurrentOwner)||
-         (issuer.toLowerCase() == walletAddress.toLowerCase() && parseInt((new Date).getTime()/1000) > expireTimeOfCurrentOwner)? (
+        {(owner.toLowerCase() == walletAddress.toLowerCase() &&
+          parseInt(new Date().getTime() / 1000) < expireTimeOfCurrentOwner) ||
+        (issuer.toLowerCase() == walletAddress.toLowerCase() &&
+          parseInt(new Date().getTime() / 1000) > expireTimeOfCurrentOwner) ? (
           <input
             type="text"
             value={valueOfString}

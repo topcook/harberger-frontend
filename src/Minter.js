@@ -11,7 +11,6 @@ import {
   web3,
   getIssuer,
   approveToken,
-  // getTimeStamp,
   getAllowances,
 } from './utils/interact'
 
@@ -28,19 +27,16 @@ const Minter = (props) => {
   const [userSettledPrice, setUserSettledPrice] = useState(0)
   const [valueOfString, setValueOfString] = useState('')
   const [expireTimeOfCurrentOwner, setExpireTimeOfCurrentOwner] = useState(0)
-  // const [currentTimeStamp, setCurrentTimeStamp] = useState(0)
 
   useEffect(async () => {
     //TODO: implement
     const { address, status } = await getCurrentWalletConnected()
     const harbergerInfo = await getHarberger()
     const issuerAddress = await getIssuer()
-    // const timestamp = await getTimeStamp()
 
     setWallet(address)
     setStatus(status)
     setIssuer(issuerAddress.status)
-    // setCurrentTimeStamp(timestamp.status)
 
     setOwner(harbergerInfo.status.owner)
     // setOwnershipPeriod(harbergerInfo.status.ownershipPeriod / 30) // 30 for testnet, 24 * 60 * 60 for mainnet
@@ -56,7 +52,6 @@ const Minter = (props) => {
     setValueOfString(harbergerInfo.status.valueOfString)
     setExpireTimeOfCurrentOwner(harbergerInfo.status.endTime)
     console.log('', parseInt(new Date().getTime() / 1000))
-    // + (new Date).getTimezoneOffset() * 60
 
     addWalletListener()
   }, [])

@@ -234,9 +234,6 @@ export const delayHarberger = async () => {
 }
 
 export const changeString = async (valueOfString) => {
-  //console.log('changeString function called')
-
-  //console.log('valueOfString: ', valueOfString)
   //load smart contract
   window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
 
@@ -263,7 +260,6 @@ export const changeString = async (valueOfString) => {
         txHash,
     }
   } catch (error) {
-    //console.log('state 3')
     return {
       success: false,
       status: '😥 Something went wrong: ' + error.message,
@@ -278,8 +274,6 @@ export const changeSettings = async (
   initialPrice,
   valueOfString,
 ) => {
-  //console.log('changeSettings function called')
-
   //load smart contract
   window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
 
@@ -324,8 +318,6 @@ export const changeSettings = async (
 }
 
 export const getHarberger = async () => {
-  //console.log('getHarberger function called')
-
   //load smart contract
   window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
 
@@ -339,8 +331,6 @@ export const getHarberger = async () => {
 }
 
 export const getIssuer = async () => {
-  //console.log('getIssuer function called')
-
   //load smart contract
   window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
 
@@ -352,15 +342,3 @@ export const getIssuer = async () => {
     status: issuerAddress,
   }
 }
-
-// export const getTimeStamp = async () => {
-//   //load smart contract
-//   window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
-
-//   const currentTimeStamp = await window.contract.methods.getCurrentTimeStamp().call()
-
-//   return {
-//     success: true,
-//     status: currentTimeStamp,
-//   }
-// }

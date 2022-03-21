@@ -11,7 +11,8 @@ import {
   web3,
   getIssuer,
   approveToken,
-  getAllowances,
+  getOwnerOfHarberger,
+  // getAllowances,
 } from './utils/interact'
 
 const Minter = (props) => {
@@ -33,12 +34,13 @@ const Minter = (props) => {
     const { address, status } = await getCurrentWalletConnected()
     const harbergerInfo = await getHarberger()
     const issuerAddress = await getIssuer()
+    const OwnerOfHarbergerAddress = await getOwnerOfHarberger()
 
     setWallet(address)
     setStatus(status)
     setIssuer(issuerAddress.status)
 
-    setOwner(harbergerInfo.status.owner)
+    setOwner(OwnerOfHarbergerAddress.status)
     // setOwnershipPeriod(harbergerInfo.status.ownershipPeriod / 30) // 30 for testnet, 24 * 60 * 60 for mainnet
     setOwnershipPeriod(harbergerInfo.status.ownershipPeriod) // 30 for testnet, 24 * 60 * 60 for mainnet
     setHarbergerHike(harbergerInfo.status.harbergerHike)

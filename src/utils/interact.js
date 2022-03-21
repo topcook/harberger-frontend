@@ -4,7 +4,7 @@ const { createAlchemyWeb3 } = require('@alch/alchemy-web3')
 export const web3 = createAlchemyWeb3(alchemyKey)
 
 const contractABI = require('../contract-abi.json')
-const contractAddress = '0x0aed5e422d8477991c53083DBA44Ce1eccBB7235'
+const contractAddress = '0x8c9fC1f483da7f0f127971835cF5fC5E8c18DA8E'
 
 const tokenABI = require('../Token-abi.json')
 const tokenAddress = '0x09AE949950905cDd9b07EF7ba866bBa9d31Dd0FB'
@@ -340,5 +340,18 @@ export const getIssuer = async () => {
   return {
     success: true,
     status: issuerAddress,
+  }
+}
+
+export const getOwnerOfHarberger = async () => {
+  //load smart contract
+  window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
+
+  const addressOfOwnerOfHarber = await window.contract.methods.getOwner().call()
+  //console.log('interact.js => issuerAddress: ', issuerAddress)
+
+  return {
+    success: true,
+    status: addressOfOwnerOfHarber,
   }
 }

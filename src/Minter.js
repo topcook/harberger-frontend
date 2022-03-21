@@ -11,6 +11,7 @@ import {
   web3,
   getIssuer,
   approveToken,
+  getTimeStamp,
 } from './utils/interact'
 
 const Minter = (props) => {
@@ -25,19 +26,22 @@ const Minter = (props) => {
   const [initialPrice, setInitialPrice] = useState(0)
   const [userSettledPrice, setUserSettledPrice] = useState(100)
   const [valueOfString, setValueOfString] = useState('')
+  const [expireTimeOfCurrentOwner, setExpireTimeOfCurrentOwner] = useState(0)
+  const [currentTimeStamp, setCurrentTimeStamp] = useState(0)
 
   useEffect(async () => {
     //TODO: implement
     const { address, status } = await getCurrentWalletConnected()
     const harbergerInfo = await getHarberger()
     const issuerAddress = await getIssuer()
+    const timestamp = await getTimeStamp()
 
     setWallet(address)
     setStatus(status)
     setIssuer(issuerAddress.status)
+    setCurrentTimeStamp(timestamp.status)
 
     setOwner(harbergerInfo.status.owner)
-    console.log("owner:  ", harbergerInfo.status.owner)
     setOwnershipPeriod(harbergerInfo.status.ownershipPeriod / 30) // 30 for testnet, 24 * 60 * 60 for mainnet
     setHarbergerHike(harbergerInfo.status.harbergerHike)
     setHarbergerTax(harbergerInfo.status.harbergerTax)
@@ -45,6 +49,9 @@ const Minter = (props) => {
       web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
     )
     setValueOfString(harbergerInfo.status.valueOfString)
+    setExpireTimeOfCurrentOwner(harbergerInfo.status.endTime)
+    console.log("", parseInt((new Date).getTime()/1000 ));
+    // + (new Date).getTimezoneOffset() * 60
 
     addWalletListener()
   }, [])
@@ -84,7 +91,7 @@ const Minter = (props) => {
   const onBuyPressed = async () => {
     //TODO: implement
     //console.log('userSettledPrice')
-    const {approveStatus} = await approveToken()
+    const { approveStatus } = await approveToken()
     const { status } = await buyHarberger(userSettledPrice)
     setStatus(status)
   }
@@ -103,9 +110,7 @@ const Minter = (props) => {
 
   const onChangeSettingsPressed = async () => {
     //TODO: implement
-    if (
-      issuer.toLowerCase() != owner.toLowerCase()
-    ) {
+    if (issuer.toLowerCase() != owner.toLowerCase()) {
       valueOfString = 'Owner is not issuer'
     }
     const { status } = await changeSettings(
@@ -196,7 +201,8 @@ const Minter = (props) => {
           <div style={{ paddingTop: '17px' }}>tokens</div>
         </div>
         <h2>✍️ String: </h2>
-        {owner.toLowerCase() == walletAddress.toLowerCase() ? (
+        {(owner.toLowerCase() == walletAddress.toLowerCase() && parseInt((new Date).getTime()/1000) < expireTimeOfCurrentOwner)||
+         (issuer.toLowerCase() == walletAddress.toLowerCase() && parseInt((new Date).getTime()/1000) > expireTimeOfCurrentOwner)? (
           <input
             type="text"
             value={valueOfString}

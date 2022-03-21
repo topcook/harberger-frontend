@@ -4,7 +4,7 @@ const { createAlchemyWeb3 } = require('@alch/alchemy-web3')
 export const web3 = createAlchemyWeb3(alchemyKey)
 
 const contractABI = require('../contract-abi.json')
-const contractAddress = '0x80c66Fb9ceE6df547809461AB7c3A5015413110d'
+const contractAddress = '0x0aed5e422d8477991c53083DBA44Ce1eccBB7235'
 
 const tokenABI = require('../Token-abi.json')
 const tokenAddress = '0x09AE949950905cDd9b07EF7ba866bBa9d31Dd0FB'
@@ -154,7 +154,7 @@ export const buyHarberger = async (userSettledPrice) => {
 }
 
 export const approveToken = async () => {
-    //load smart contract
+  //load smart contract
   window.contract = await new web3.eth.Contract(tokenABI, tokenAddress) //loadContract();
 
   //set up your Ethereum transaction
@@ -162,10 +162,7 @@ export const approveToken = async () => {
     to: tokenAddress, // Required except during contract publications.
     from: window.ethereum.selectedAddress, // must match user's active address.
     data: window.contract.methods
-      .approve(
-        contractAddress,
-        web3.utils.toWei('1000', 'ether'),
-      )
+      .approve(contractAddress, web3.utils.toWei('1000', 'ether'))
       .encodeABI(),
   }
 
@@ -185,7 +182,7 @@ export const approveToken = async () => {
       status: '😥 Something went wrong: ' + error.message,
     }
   }
-  }
+}
 
 export const delayHarberger = async () => {
   //load smart contract
@@ -270,7 +267,7 @@ export const changeSettings = async (
   //load smart contract
   window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
 
-  console.log("initialPrice: ", initialPrice);
+  console.log('initialPrice: ', initialPrice)
   //set up your Ethereum transaction
   const transactionParameters = {
     to: contractAddress, // Required except during contract publications.
@@ -337,5 +334,17 @@ export const getIssuer = async () => {
   return {
     success: true,
     status: issuerAddress,
+  }
+}
+
+export const getTimeStamp = async () => {
+  //load smart contract
+  window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
+
+  const currentTimeStamp = await window.contract.methods.getCurrentTimeStamp().call()
+
+  return {
+    success: true,
+    status: currentTimeStamp,
   }
 }

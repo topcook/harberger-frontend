@@ -153,33 +153,49 @@ export const buyHarberger = async (userSettledPrice) => {
   }
 }
 
-export const approveToken = async () => {
+export const approveToken = async (walletAddress, userSettledPrice) => {
   //load smart contract
   window.contract = await new web3.eth.Contract(tokenABI, tokenAddress) //loadContract();
 
-  //set up your Ethereum transaction
-  const transactionParameters = {
-    to: tokenAddress, // Required except during contract publications.
-    from: window.ethereum.selectedAddress, // must match user's active address.
-    data: window.contract.methods
-      .approve(contractAddress, web3.utils.toWei('1000', 'ether'))
-      .encodeABI(),
-  }
+  //get allowance
+  const allowanceOfToken = await window.contract.methods
+    .allowance(walletAddress, contractAddress)
+    .call()
+  console.log('allowances: ', web3.utils.fromWei(allowanceOfToken, 'ether'))
 
-  //sign transaction via Metamask
-  try {
-    const txHash = await window.ethereum.request({
-      method: 'eth_sendTransaction',
-      params: [transactionParameters],
-    })
-    return {
-      success: true,
-      status: 'approve success',
+  console.log('userSettledPrice: ', userSettledPrice)
+
+  let amountOfTokensToAllow = 0
+  if (allowanceOfToken < userSettledPrice) {
+    amountOfTokensToAllow = userSettledPrice - allowanceOfToken
+    const transactionParameters = {
+      to: tokenAddress, // Required except during contract publications.
+      from: window.ethereum.selectedAddress, // must match user's active address.
+      data: window.contract.methods
+        .approve(contractAddress, web3.utils.toWei('1000', 'ether'))
+        .encodeABI(),
     }
-  } catch (error) {
+
+    //sign transaction via Metamask
+    try {
+      const txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [transactionParameters],
+      })
+      return {
+        success: true,
+        status: 'approve success',
+      }
+    } catch (error) {
+      return {
+        success: false,
+        status: '😥 Something went wrong: ' + error.message,
+      }
+    }
+  } else {
     return {
       success: false,
-      status: '😥 Something went wrong: ' + error.message,
+      status: '😥 Enough allowance',
     }
   }
 }

@@ -12,6 +12,7 @@ import {
   getIssuer,
   approveToken,
   // getTimeStamp,
+  getAllowances,
 } from './utils/interact'
 
 const Minter = (props) => {
@@ -93,8 +94,7 @@ const Minter = (props) => {
 
   const onBuyPressed = async () => {
     //TODO: implement
-    //console.log('userSettledPrice')
-    const { approveStatus } = await approveToken()
+    await approveToken(walletAddress, userSettledPrice)
     const { status } = await buyHarberger(userSettledPrice)
     setStatus(status)
   }

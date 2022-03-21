@@ -221,22 +221,48 @@ const Minter = (props) => {
           />
         )}
       </form>
-      <button
-        id="buyButton"
-        className="contractButton"
-        style={{ marginRight: '40px' }}
-        onClick={onBuyPressed}
-      >
-        Buy
-      </button>
-      <button
-        id="delayButton"
-        className="contractButton"
-        style={{ marginRight: '40px' }}
-        onClick={onDelayPressed}
-      >
-        Delay Expire Time
-      </button>
+
+      {owner.toLowerCase() == walletAddress.toLowerCase() ? (
+        <button
+          id="buyButton"
+          className="contractButton disabled"
+          style={{ marginRight: '30px' }}
+          // onClick={onBuyPressed}
+          disabled
+        >
+          Buy
+        </button>
+      ) : (
+        <button
+          id="buyButton"
+          className="contractButton"
+          style={{ marginRight: '30px' }}
+          onClick={onBuyPressed}
+        >
+          Buy
+        </button>
+      )}
+      {owner.toLowerCase() == walletAddress.toLowerCase() && owner.toLowerCase() != issuer.toLowerCase() ? (
+        <button
+          id="delayButton"
+          className="contractButton"
+          style={{ marginRight: '30px' }}
+          onClick={onDelayPressed}
+        >
+          Delay Expire Time
+        </button>
+      ) : (
+        <button
+          id="delayButton"
+          className="contractButton disabled"
+          style={{ marginRight: '30px' }}
+          // onClick={onDelayPressed}
+          disabled
+        >
+          Delay Expire Time
+        </button>
+      )}
+
       {issuer.toLowerCase() == walletAddress.toLowerCase() ? (
         <button
           id="changeButton"
@@ -246,13 +272,21 @@ const Minter = (props) => {
           Change settings
         </button>
       ) : (
-        <button
-          id="changeButton"
-          className="contractButton"
-          onClick={onChangeStringPressed}
-        >
-          Change string
-        </button>
+        <>
+          {owner.toLowerCase() == walletAddress.toLowerCase() ? (
+            <button
+              id="changeButton"
+              className="contractButton"
+              onClick={onChangeStringPressed}
+            >
+              Change string
+            </button>
+          ) : (
+            <button id="changeButton" type= "button" className="contractButton disabled" disabled>
+              Change string
+            </button>
+          )}
+        </>
       )}
       <p id="status" style={{ paddingBottom: '100px' }}>
         {parse(status)}

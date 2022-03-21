@@ -80,3 +80,8 @@ button {
   background-color: #254cdd;
   color:white;
 }
+
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

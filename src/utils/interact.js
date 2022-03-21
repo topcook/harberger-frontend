@@ -4,7 +4,7 @@ const { createAlchemyWeb3 } = require('@alch/alchemy-web3')
 export const web3 = createAlchemyWeb3(alchemyKey)
 
 const contractABI = require('../contract-abi.json')
-const contractAddress = '0x8c9fC1f483da7f0f127971835cF5fC5E8c18DA8E'
+const contractAddress = '0x2E407f2e1085EE812792fcBB49DEa5848D9ccFA5'
 
 const tokenABI = require('../Token-abi.json')
 const tokenAddress = '0x09AE949950905cDd9b07EF7ba866bBa9d31Dd0FB'

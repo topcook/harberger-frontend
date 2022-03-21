@@ -43,7 +43,8 @@ const Minter = (props) => {
     // setCurrentTimeStamp(timestamp.status)
 
     setOwner(harbergerInfo.status.owner)
-    setOwnershipPeriod(harbergerInfo.status.ownershipPeriod / 30) // 30 for testnet, 24 * 60 * 60 for mainnet
+    // setOwnershipPeriod(harbergerInfo.status.ownershipPeriod / 30) // 30 for testnet, 24 * 60 * 60 for mainnet
+    setOwnershipPeriod(harbergerInfo.status.ownershipPeriod) // 30 for testnet, 24 * 60 * 60 for mainnet
     setHarbergerHike(harbergerInfo.status.harbergerHike)
     setHarbergerTax(harbergerInfo.status.harbergerTax)
     setInitialPrice(
@@ -117,7 +118,7 @@ const Minter = (props) => {
       valueOfString = 'Owner is not issuer'
     }
     const { status } = await changeSettings(
-      ownershipPeriod,
+      ownershipPeriod / 30,
       harbergerHike,
       harbergerTax,
       initialPrice,
@@ -181,7 +182,8 @@ const Minter = (props) => {
             <h2>⏲ Harberger Duration Period: </h2>
             <div style={{ display: 'flex' }}>
               <input type="text" value={ownershipPeriod} readOnly />
-              <div style={{ paddingTop: '17px' }}>days</div>
+              {/* <div style={{ paddingTop: '17px' }}>days</div> */}
+              <div style={{ paddingTop: '17px' }}>seconds</div>
             </div>
             <h2>🏦 Harberger Hike: </h2>
             <input type="text" value={harbergerHike} readOnly />

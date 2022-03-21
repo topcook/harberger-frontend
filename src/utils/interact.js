@@ -337,14 +337,14 @@ export const getIssuer = async () => {
   }
 }
 
-export const getTimeStamp = async () => {
-  //load smart contract
-  window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
+// export const getTimeStamp = async () => {
+//   //load smart contract
+//   window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
 
-  const currentTimeStamp = await window.contract.methods.getCurrentTimeStamp().call()
+//   const currentTimeStamp = await window.contract.methods.getCurrentTimeStamp().call()
 
-  return {
-    success: true,
-    status: currentTimeStamp,
-  }
-}
+//   return {
+//     success: true,
+//     status: currentTimeStamp,
+//   }
+// }

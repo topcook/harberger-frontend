@@ -3,6 +3,8 @@ const alchemyKey = process.env.REACT_APP_ALCHEMY_KEY
 const { createAlchemyWeb3 } = require('@alch/alchemy-web3')
 export const web3 = createAlchemyWeb3(alchemyKey)
 
+//export const contractABI = require('../contract-abi.json')
+//export const contractAddress = '0x2E407f2e1085EE812792fcBB49DEa5848D9ccFA5'
 const contractABI = require('../contract-abi.json')
 const contractAddress = '0x2E407f2e1085EE812792fcBB49DEa5848D9ccFA5'
 

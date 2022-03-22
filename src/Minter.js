@@ -12,6 +12,9 @@ import {
   getIssuer,
   approveToken,
   getOwnerOfHarberger,
+  //contractABI,
+  //contractAddress
+  // addSmartContractListener,
   // getAllowances,
 } from './utils/interact'
 
@@ -56,7 +59,38 @@ const Minter = (props) => {
     console.log('', parseInt(new Date().getTime() / 1000))
 
     addWalletListener()
+    // addSmartContractListener()
   }, [])
+
+  // useEffect(async () => {
+  //   //TODO: implement
+  //   const { address, status } = await getCurrentWalletConnected()
+  //   const harbergerInfo = await getHarberger()
+  //   const issuerAddress = await getIssuer()
+  //   const OwnerOfHarbergerAddress = await getOwnerOfHarberger()
+
+  //   setWallet(address)
+  //   setStatus(status)
+  //   setIssuer(issuerAddress.status)
+
+  //   setOwner(OwnerOfHarbergerAddress.status)
+  //   // setOwnershipPeriod(harbergerInfo.status.ownershipPeriod / 30) // 30 for testnet, 24 * 60 * 60 for mainnet
+  //   setOwnershipPeriod(harbergerInfo.status.ownershipPeriod) // 30 for testnet, 24 * 60 * 60 for mainnet
+  //   setHarbergerHike(harbergerInfo.status.harbergerHike)
+  //   setHarbergerTax(harbergerInfo.status.harbergerTax)
+  //   setInitialPrice(
+  //     web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
+  //   )
+  //   setUserSettledPrice(
+  //     web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
+  //   )
+  //   setValueOfString(harbergerInfo.status.valueOfString)
+  //   setExpireTimeOfCurrentOwner(harbergerInfo.status.endTime)
+  //   console.log('owner change event', parseInt(new Date().getTime() / 1000))
+
+  //   addWalletListener()
+  //   addSmartContractListener()
+  // }, [owner])
 
   const connectWalletPressed = async () => {
     //TODO: implement
@@ -89,6 +123,29 @@ const Minter = (props) => {
       )
     }
   }
+
+  // function addSmartContractListener() {
+  //   //load smart contract
+  //   window.contract = new web3.eth.Contract(contractABI, contractAddress) //loadContract();
+  //   // OwnershipChangedEvent(address indexed account)
+  //   window.contract.events.OwnershipChangedEvent({}, async (error, data) => {
+  //     if (error) {
+  //       setStatus("😥 " + error.message);
+  //     } else {
+  //       console.log("ownership changed: ", data.returnValues[1]);
+
+  //       const OwnerOfHarbergerAddress = await getOwnerOfHarberger()
+   
+  //       setOwner(OwnerOfHarbergerAddress.status)
+  //       setStatus("000000000000000000000000000000000000000000000000000000")
+
+  //       // setMessage(data.returnValues[1]);
+  //       // setNewMessage("");
+  //       // setStatus("🎉 Your message has been updated!");
+
+  //     }
+  //   });
+  // }
 
   const onBuyPressed = async () => {
     //TODO: implement
@@ -222,7 +279,7 @@ const Minter = (props) => {
         )}
       </form>
 
-      {owner.toLowerCase() == walletAddress.toLowerCase() ? (
+      {owner.toLowerCase() == walletAddress.toLowerCase() || walletAddress == '' ? (
         <button
           id="buyButton"
           className="contractButton disabled"
@@ -263,7 +320,7 @@ const Minter = (props) => {
         </button>
       )}
 
-      {issuer.toLowerCase() == walletAddress.toLowerCase() ? (
+      {issuer.toLowerCase() == walletAddress.toLowerCase() && walletAddress != '' ? (
         <button
           id="changeButton"
           className="contractButton"
@@ -273,7 +330,7 @@ const Minter = (props) => {
         </button>
       ) : (
         <>
-          {owner.toLowerCase() == walletAddress.toLowerCase() ? (
+          {owner.toLowerCase() == walletAddress.toLowerCase() && walletAddress != '' ? (
             <button
               id="changeButton"
               className="contractButton"

@@ -226,7 +226,8 @@ const Minter = (props) => {
                 value={initialPrice}
                 onChange={(event) => setInitialPrice(event.target.value)}
               />
-              <div style={{ paddingTop: '17px' }}>tokens</div>
+              {/* <div style={{ paddingTop: '17px' }}>tokens</div> */}
+              <div style={{ paddingTop: '17px' }}>ether</div>
             </div>
           </div>
         ) : (
@@ -244,7 +245,8 @@ const Minter = (props) => {
             <h2>🤔 Initial Price: </h2>
             <div style={{ display: 'flex' }}>
               <input type="text" value={initialPrice} readOnly />
-              <div style={{ paddingTop: '17px' }}>tokens</div>
+              {/* <div style={{ paddingTop: '17px' }}>tokens</div> */}
+              <div style={{ paddingTop: '17px' }}>ether</div>
             </div>
           </div>
         )}
@@ -255,7 +257,8 @@ const Minter = (props) => {
             value={userSettledPrice}
             onChange={(event) => setUserSettledPrice(event.target.value)}
           />
-          <div style={{ paddingTop: '17px' }}>tokens</div>
+          {/* <div style={{ paddingTop: '17px' }}>tokens</div> */}
+          <div style={{ paddingTop: '17px' }}>ether</div>
         </div>
         <h2>✍️ String: </h2>
         {(owner.toLowerCase() == walletAddress.toLowerCase() &&

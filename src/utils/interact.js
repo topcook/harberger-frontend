@@ -13,7 +13,7 @@ const tokenAddress = '0x09AE949950905cDd9b07EF7ba866bBa9d31Dd0FB'
 
 export const connectWallet = async () => {
   if (window.ethereum) {
-    const chainId = 3 // 3 for ropsten, 4 for rinkeby, 1 for mainnet
+    const chainId = 4 // 3 for ropsten, 4 for rinkeby, 1 for mainnet
 
     // switch to chainId
     if (window.ethereum.networkVersion !== chainId) {

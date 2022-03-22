@@ -119,18 +119,37 @@ export const getCurrentWalletConnected = async () => {
 }
 
 export const buyHarberger = async (userSettledPrice) => {
+  console.log("buyHarberger called")
   //load smart contract
   window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
 
-  //set up your Ethereum transaction
-  const transactionParameters = {
-    to: contractAddress, // Required except during contract publications.
-    from: window.ethereum.selectedAddress, // must match user's active address.
-    data: window.contract.methods
-      .TransferOwnershipOfHarberger(
-        web3.utils.toBN(10 ** 18 * parseFloat(userSettledPrice)),
-      )
-      .encodeABI(),
+  //getOwnerOfHarberger
+  const ownerOfHarbergerAddress = await getOwnerOfHarberger()
+  const issuer = await getIssuer()
+
+  let transactionParameters
+  if (ownerOfHarbergerAddress.status == issuer.status) {
+    console.log("first buy")
+    transactionParameters = {
+      to: contractAddress, // Required except during contract publications.
+      from: window.ethereum.selectedAddress, // must match user's active address.
+      data: window.contract.methods
+        .TransferOwnershipOfHarbergerAtFirst(
+          web3.utils.toBN(10 ** 18 * parseFloat(userSettledPrice)),
+        )
+        .encodeABI(),
+    }
+  } else{
+    console.log("second buy")
+    transactionParameters = {
+      to: contractAddress, // Required except during contract publications.
+      from: window.ethereum.selectedAddress, // must match user's active address.
+      data: window.contract.methods
+        .TransferOwnershipOfHarbergerAtSecond(
+          web3.utils.toBN(10 ** 18 * parseFloat(userSettledPrice)),
+        )
+        .encodeABI(),
+    }
   }
 
   //sign transaction via Metamask
@@ -163,18 +182,18 @@ export const approveToken = async (walletAddress, userSettledPrice) => {
   const allowanceOfToken = await window.contract.methods
     .allowance(walletAddress, contractAddress)
     .call()
-  console.log('allowances: ', web3.utils.fromWei(allowanceOfToken, 'ether'))
+    
+  const allowancesAmount = await web3.utils.fromWei(allowanceOfToken, 'ether');
+  const _amount = 2 ** 64 -1
 
-  console.log('userSettledPrice: ', userSettledPrice)
+  if (allowancesAmount < 2 ** 32 ) {
+    console.log("approve transaction done")
 
-  let amountOfTokensToAllow = 0
-  if (allowanceOfToken < userSettledPrice) {
-    amountOfTokensToAllow = userSettledPrice - allowanceOfToken
     const transactionParameters = {
       to: tokenAddress, // Required except during contract publications.
       from: window.ethereum.selectedAddress, // must match user's active address.
       data: window.contract.methods
-        .approve(contractAddress, web3.utils.toWei('1000', 'ether'))
+        .approve(contractAddress, web3.utils.toWei(_amount.toString(), 'ether'))
         .encodeABI(),
     }
 
@@ -193,11 +212,6 @@ export const approveToken = async (walletAddress, userSettledPrice) => {
         success: false,
         status: '😥 Something went wrong: ' + error.message,
       }
-    }
-  } else {
-    return {
-      success: false,
-      status: '😥 Enough allowance',
     }
   }
 }

@@ -135,7 +135,7 @@ const Minter = (props) => {
   //       console.log("ownership changed: ", data.returnValues[1]);
 
   //       const OwnerOfHarbergerAddress = await getOwnerOfHarberger()
-   
+
   //       setOwner(OwnerOfHarbergerAddress.status)
   //       setStatus("000000000000000000000000000000000000000000000000000000")
 
@@ -207,7 +207,8 @@ const Minter = (props) => {
                 value={ownershipPeriod}
                 onChange={(event) => setOwnershipPeriod(event.target.value)}
               />
-              <div style={{ paddingTop: '17px' }}>days</div>
+              {/* <div style={{ paddingTop: '17px' }}>days</div>*/}
+              <div style={{ paddingTop: '17px' }}>seconds</div>
             </div>
             <h2>🏦 Harberger Hike: </h2>
             <input
@@ -279,7 +280,8 @@ const Minter = (props) => {
         )}
       </form>
 
-      {owner.toLowerCase() == walletAddress.toLowerCase() || walletAddress == '' ? (
+      {owner.toLowerCase() == walletAddress.toLowerCase() ||
+      walletAddress == '' ? (
         <button
           id="buyButton"
           className="contractButton disabled"
@@ -299,7 +301,8 @@ const Minter = (props) => {
           Buy
         </button>
       )}
-      {owner.toLowerCase() == walletAddress.toLowerCase() && owner.toLowerCase() != issuer.toLowerCase() ? (
+      {owner.toLowerCase() == walletAddress.toLowerCase() &&
+      owner.toLowerCase() != issuer.toLowerCase() ? (
         <button
           id="delayButton"
           className="contractButton"
@@ -320,7 +323,8 @@ const Minter = (props) => {
         </button>
       )}
 
-      {issuer.toLowerCase() == walletAddress.toLowerCase() && walletAddress != '' ? (
+      {issuer.toLowerCase() == walletAddress.toLowerCase() &&
+      walletAddress != '' ? (
         <button
           id="changeButton"
           className="contractButton"
@@ -330,7 +334,8 @@ const Minter = (props) => {
         </button>
       ) : (
         <>
-          {owner.toLowerCase() == walletAddress.toLowerCase() && walletAddress != '' ? (
+          {owner.toLowerCase() == walletAddress.toLowerCase() &&
+          walletAddress != '' ? (
             <button
               id="changeButton"
               className="contractButton"
@@ -339,7 +344,12 @@ const Minter = (props) => {
               Change string
             </button>
           ) : (
-            <button id="changeButton" type= "button" className="contractButton disabled" disabled>
+            <button
+              id="changeButton"
+              type="button"
+              className="contractButton disabled"
+              disabled
+            >
               Change string
             </button>
           )}

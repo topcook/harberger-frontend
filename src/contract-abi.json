@@ -1,12 +1,6 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "token_",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -88,49 +82,53 @@
     "type": "event"
   },
   {
+    "stateMutability": "payable",
+    "type": "fallback"
+  },
+  {
     "inputs": [],
     "name": "DelayEndTimeOfOwnership",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "TransferOwnershipOfHarberger",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_amount",
+        "name": "_newAuctionPrice",
         "type": "uint256"
       }
     ],
     "name": "TransferOwnershipOfHarbergerAtFirst",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_amount",
+        "name": "_newAuctionPrice",
         "type": "uint256"
       }
     ],
     "name": "TransferOwnershipOfHarbergerAtSecond",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCurrentOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -200,38 +198,12 @@
   },
   {
     "inputs": [],
-    "name": "getOwner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "getOwnershipPeriod",
     "outputs": [
       {
         "internalType": "uint32",
         "name": "",
         "type": "uint32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getTokenAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -256,7 +228,7 @@
     "outputs": [
       {
         "internalType": "address",
-        "name": "owner",
+        "name": "currentOwner",
         "type": "address"
       },
       {
@@ -291,7 +263,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "finalPrice",
+        "name": "auctionPrice",
         "type": "uint256"
       },
       {
@@ -345,19 +317,6 @@
       }
     ],
     "name": "setOwnershipPeriod",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "token_",
-        "type": "address"
-      }
-    ],
-    "name": "setTokenAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -420,5 +379,9 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
   }
 ]

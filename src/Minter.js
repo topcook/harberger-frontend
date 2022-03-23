@@ -10,7 +10,7 @@ import {
   changeSettings,
   web3,
   getIssuer,
-  approveToken,
+  // approveToken,
   getOwnerOfHarberger,
   //contractABI,
   //contractAddress
@@ -31,6 +31,7 @@ const Minter = (props) => {
   const [userSettledPrice, setUserSettledPrice] = useState(0)
   const [valueOfString, setValueOfString] = useState('')
   const [expireTimeOfCurrentOwner, setExpireTimeOfCurrentOwner] = useState(0)
+  const [auctionPrice, setAuctionPrice] = useState(0)
 
   useEffect(async () => {
     //TODO: implement
@@ -52,7 +53,10 @@ const Minter = (props) => {
       web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
     )
     setUserSettledPrice(
-      web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
+      web3.utils.fromWei(harbergerInfo.status.auctionPrice, 'ether'),
+    )
+    setAuctionPrice(
+      web3.utils.fromWei(harbergerInfo.status.auctionPrice, 'ether'),
     )
     setValueOfString(harbergerInfo.status.valueOfString)
     setExpireTimeOfCurrentOwner(harbergerInfo.status.endTime)
@@ -61,36 +65,6 @@ const Minter = (props) => {
     addWalletListener()
     // addSmartContractListener()
   }, [])
-
-  // useEffect(async () => {
-  //   //TODO: implement
-  //   const { address, status } = await getCurrentWalletConnected()
-  //   const harbergerInfo = await getHarberger()
-  //   const issuerAddress = await getIssuer()
-  //   const OwnerOfHarbergerAddress = await getOwnerOfHarberger()
-
-  //   setWallet(address)
-  //   setStatus(status)
-  //   setIssuer(issuerAddress.status)
-
-  //   setOwner(OwnerOfHarbergerAddress.status)
-  //   // setOwnershipPeriod(harbergerInfo.status.ownershipPeriod / 30) // 30 for testnet, 24 * 60 * 60 for mainnet
-  //   setOwnershipPeriod(harbergerInfo.status.ownershipPeriod) // 30 for testnet, 24 * 60 * 60 for mainnet
-  //   setHarbergerHike(harbergerInfo.status.harbergerHike)
-  //   setHarbergerTax(harbergerInfo.status.harbergerTax)
-  //   setInitialPrice(
-  //     web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
-  //   )
-  //   setUserSettledPrice(
-  //     web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
-  //   )
-  //   setValueOfString(harbergerInfo.status.valueOfString)
-  //   setExpireTimeOfCurrentOwner(harbergerInfo.status.endTime)
-  //   console.log('owner change event', parseInt(new Date().getTime() / 1000))
-
-  //   addWalletListener()
-  //   addSmartContractListener()
-  // }, [owner])
 
   const connectWalletPressed = async () => {
     //TODO: implement
@@ -145,22 +119,60 @@ const Minter = (props) => {
   // }
 
   const onBuyPressed = async () => {
-    //TODO: implement
-    await approveToken(walletAddress, userSettledPrice)
-    const { status } = await buyHarberger(userSettledPrice)
-    setStatus(status)
+    // TODO: implement
+    // await approveToken(walletAddress, userSettledPrice)
+    if (
+      !(
+        owner.toLowerCase() == walletAddress.toLowerCase() ||
+        issuer.toLowerCase() == walletAddress.toLowerCase() ||
+        walletAddress == ''
+      )
+    ) {
+      if (owner.toLowerCase() == issuer.toLowerCase()) {
+        if (userSettledPrice < initialPrice) {
+          // first sale
+          alert('User settled price should be bigger than initial price')
+          return
+        }
+      } else if (
+        userSettledPrice <
+        auctionPrice + auctionPrice * harbergerHike / 100
+      ) {
+        console.log("second sale ", auctionPrice + auctionPrice * harbergerHike / 100)
+        // second sale
+        alert('User settled price should be bigger in second sale')
+        return
+      }
+      const { status } = await buyHarberger(
+        userSettledPrice,
+        harbergerHike,
+        harbergerTax,
+      )
+      setStatus(status)
+    }
   }
 
   const onDelayPressed = async () => {
     //TODO: implement
-    const { status } = await delayHarberger()
-    setStatus(status)
+    if (
+      owner.toLowerCase() == walletAddress.toLowerCase() &&
+      walletAddress != ''
+    ) {
+      console.log("minter.js  auctionprice ", auctionPrice)
+      const { status } = await delayHarberger(auctionPrice, harbergerTax)
+      setStatus(status)
+    }
   }
 
   const onChangeStringPressed = async () => {
     //TODO: implement
-    const { status } = await changeString(valueOfString)
-    setStatus(status)
+    if (
+      owner.toLowerCase() == walletAddress.toLowerCase() &&
+      walletAddress != ''
+    ) {
+      const { status } = await changeString(valueOfString)
+      setStatus(status)
+    }
   }
 
   const onChangeSettingsPressed = async () => {
@@ -168,14 +180,19 @@ const Minter = (props) => {
     if (issuer.toLowerCase() != owner.toLowerCase()) {
       valueOfString = 'Owner is not issuer'
     }
-    const { status } = await changeSettings(
-      ownershipPeriod / 30,
-      harbergerHike,
-      harbergerTax,
-      initialPrice,
-      valueOfString,
-    )
-    setStatus(status)
+    if (
+      issuer.toLowerCase() == walletAddress.toLowerCase() &&
+      walletAddress != ''
+    ) {
+      const { status } = await changeSettings(
+        ownershipPeriod / 30,
+        harbergerHike,
+        harbergerTax,
+        initialPrice,
+        valueOfString,
+      )
+      setStatus(status)
+    }
   }
 
   return (
@@ -281,6 +298,7 @@ const Minter = (props) => {
       </form>
 
       {owner.toLowerCase() == walletAddress.toLowerCase() ||
+      issuer.toLowerCase() == walletAddress.toLowerCase() ||
       walletAddress == '' ? (
         <button
           id="buyButton"

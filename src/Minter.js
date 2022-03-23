@@ -18,6 +18,9 @@ import {
   // getAllowances,
 } from './utils/interact'
 
+const contractABI = require('./contract-abi.json')
+const contractAddress = '0xD524ec8776987D4Ce7c5aAE5F92B92bc6b2AFf55'
+
 const Minter = (props) => {
   //State variables
   const [walletAddress, setWallet] = useState('')
@@ -31,7 +34,7 @@ const Minter = (props) => {
   const [userSettledPrice, setUserSettledPrice] = useState(0)
   const [valueOfString, setValueOfString] = useState('')
   const [expireTimeOfCurrentOwner, setExpireTimeOfCurrentOwner] = useState(0)
-  const [auctionPrice, setAuctionPrice] = useState(0)
+  const [previousAuctionPrice, setPreviousAuctionPrice] = useState(0)
 
   useEffect(async () => {
     //TODO: implement
@@ -52,18 +55,35 @@ const Minter = (props) => {
     setInitialPrice(
       web3.utils.fromWei(harbergerInfo.status.initialPrice, 'ether'),
     )
-    setUserSettledPrice(
-      web3.utils.fromWei(harbergerInfo.status.auctionPrice, 'ether'),
-    )
-    setAuctionPrice(
-      web3.utils.fromWei(harbergerInfo.status.auctionPrice, 'ether'),
+    if (
+      OwnerOfHarbergerAddress.status.toLowerCase() ==
+      issuerAddress.status.toLowerCase()
+    ) {
+      //first sale
+      console.log('first sale')
+      setUserSettledPrice(web3.utils.fromWei(harbergerInfo.status.initialPrice))
+    } else {
+      //second sale
+      console.log('second sale')
+      const previousAuctionPrice = web3.utils.fromWei(
+        harbergerInfo.status.previousAuctionPrice,
+      )
+      const newAuctionPrice =
+        parseFloat(previousAuctionPrice) *
+        (1 + parseFloat(harbergerInfo.status.harbergerHike) / 100)
+
+      setUserSettledPrice(parseFloat(newAuctionPrice.toFixed(6)))
+    }
+
+    setPreviousAuctionPrice(
+      web3.utils.fromWei(harbergerInfo.status.previousAuctionPrice),
     )
     setValueOfString(harbergerInfo.status.valueOfString)
     setExpireTimeOfCurrentOwner(harbergerInfo.status.endTime)
     console.log('', parseInt(new Date().getTime() / 1000))
 
     addWalletListener()
-    // addSmartContractListener()
+    addSmartContractListener()
   }, [])
 
   const connectWalletPressed = async () => {
@@ -95,28 +115,29 @@ const Minter = (props) => {
     }
   }
 
-  // function addSmartContractListener() {
-  //   //load smart contract
-  //   window.contract = new web3.eth.Contract(contractABI, contractAddress) //loadContract();
-  //   // OwnershipChangedEvent(address indexed account)
-  //   window.contract.events.OwnershipChangedEvent({}, async (error, data) => {
-  //     if (error) {
-  //       setStatus("😥 " + error.message);
-  //     } else {
-  //       console.log("ownership changed: ", data.returnValues[1]);
+  function addSmartContractListener() {
+    //load smart contract
+    const contract = new web3.eth.Contract(contractABI, contractAddress) //loadContract();
+    // OwnershipChangedEvent(address indexed account)
+    contract.events.OwnershipChangedEvent({}, async (error, data) => {
+      console.log("111111111111111111111111111", data)
+      // if (error) {
+      //   setStatus("😥 " + error.message);
+      // } else {
+      //   console.log("ownership changed: ", data.returnValues[1]);
 
-  //       const OwnerOfHarbergerAddress = await getOwnerOfHarberger()
+      //   const OwnerOfHarbergerAddress = await getOwnerOfHarberger()
 
-  //       setOwner(OwnerOfHarbergerAddress.status)
-  //       setStatus("000000000000000000000000000000000000000000000000000000")
+      //   setOwner(OwnerOfHarbergerAddress.status)
+      //   setStatus("000000000000000000000000000000000000000000000000000000")
 
-  //       // setMessage(data.returnValues[1]);
-  //       // setNewMessage("");
-  //       // setStatus("🎉 Your message has been updated!");
+      //   // setMessage(data.returnValues[1]);
+      //   // setNewMessage("");
+      //   // setStatus("🎉 Your message has been updated!");
 
-  //     }
-  //   });
-  // }
+      // }
+    });
+  }
 
   const onBuyPressed = async () => {
     // TODO: implement
@@ -129,16 +150,15 @@ const Minter = (props) => {
       )
     ) {
       if (owner.toLowerCase() == issuer.toLowerCase()) {
-        if (userSettledPrice < initialPrice) {
+        if (parseFloat(userSettledPrice) < parseFloat(initialPrice)) {
           // first sale
           alert('User settled price should be bigger than initial price')
           return
         }
       } else if (
-        userSettledPrice <
-        auctionPrice + auctionPrice * harbergerHike / 100
+        parseFloat(userSettledPrice) <
+        parseFloat(previousAuctionPrice) * (1 + parseFloat(harbergerHike) / 100)
       ) {
-        console.log("second sale ", auctionPrice + auctionPrice * harbergerHike / 100)
         // second sale
         alert('User settled price should be bigger in second sale')
         return
@@ -158,8 +178,11 @@ const Minter = (props) => {
       owner.toLowerCase() == walletAddress.toLowerCase() &&
       walletAddress != ''
     ) {
-      console.log("minter.js  auctionprice ", auctionPrice)
-      const { status } = await delayHarberger(auctionPrice, harbergerTax)
+      // console.log('minter.js  auctionprice ', previousAuctionPrice)
+      const { status } = await delayHarberger(
+        previousAuctionPrice,
+        harbergerTax,
+      )
       setStatus(status)
     }
   }
@@ -178,7 +201,7 @@ const Minter = (props) => {
   const onChangeSettingsPressed = async () => {
     //TODO: implement
     if (issuer.toLowerCase() != owner.toLowerCase()) {
-      valueOfString = 'Owner is not issuer'
+      valueOfString = 'Current owner is not the issuer'
     }
     if (
       issuer.toLowerCase() == walletAddress.toLowerCase() &&

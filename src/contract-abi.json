@@ -263,7 +263,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "auctionPrice",
+        "name": "previousAuctionPrice",
         "type": "uint256"
       },
       {

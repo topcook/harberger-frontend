@@ -35,6 +35,7 @@ const Minter = (props) => {
   const [valueOfString, setValueOfString] = useState('')
   const [expireTimeOfCurrentOwner, setExpireTimeOfCurrentOwner] = useState(0)
   const [previousAuctionPrice, setPreviousAuctionPrice] = useState(0)
+  const [delayButtonStatus, setDelayButtonStatus] = useState(false)
 
   useEffect(async () => {
     //TODO: implement
@@ -82,8 +83,12 @@ const Minter = (props) => {
     setExpireTimeOfCurrentOwner(harbergerInfo.status.endTime)
     console.log('', parseInt(new Date().getTime() / 1000))
 
+    const delayPossible = OwnerOfHarbergerAddress.status.toLowerCase() == address.toLowerCase() && address != ''
+    console.log("delayPossible: ", delayPossible)
+    console.log("owner: ", OwnerOfHarbergerAddress.status.toLowerCase())
+    console.log("wallet: ", address.toLowerCase())
+    setDelayButtonStatus(delayPossible)
     addWalletListener()
-    addSmartContractListener()
   }, [])
 
   const connectWalletPressed = async () => {
@@ -115,29 +120,32 @@ const Minter = (props) => {
     }
   }
 
-  function addSmartContractListener() {
-    //load smart contract
-    const contract = new web3.eth.Contract(contractABI, contractAddress) //loadContract();
-    // OwnershipChangedEvent(address indexed account)
-    contract.events.OwnershipChangedEvent({}, async (error, data) => {
-      console.log("111111111111111111111111111", data)
-      // if (error) {
-      //   setStatus("😥 " + error.message);
-      // } else {
-      //   console.log("ownership changed: ", data.returnValues[1]);
+  
+  // function addSmartContractListener(data) {
+  //   // //load smart contract
+  //   // const contract = new web3.eth.Contract(contractABI, contractAddress) //loadContract();
 
-      //   const OwnerOfHarbergerAddress = await getOwnerOfHarberger()
+  //   // contract.on("OwnershipChangedEvent", addSmartContractListener)
+  //   // OwnershipChangedEvent(address indexed account)
+  //   // contract.events.OwnershipChangedEvent({}, async (error, data) => {
+  //     console.log('111111111111111111111111111', data)
+  //     // if (error) {
+  //     //   setStatus("😥 " + error.message);
+  //     // } else {
+  //     //   console.log("ownership changed: ", data.returnValues[1]);
 
-      //   setOwner(OwnerOfHarbergerAddress.status)
-      //   setStatus("000000000000000000000000000000000000000000000000000000")
+  //     //   const OwnerOfHarbergerAddress = await getOwnerOfHarberger()
 
-      //   // setMessage(data.returnValues[1]);
-      //   // setNewMessage("");
-      //   // setStatus("🎉 Your message has been updated!");
+  //     //   setOwner(OwnerOfHarbergerAddress.status)
+  //     //   setStatus("000000000000000000000000000000000000000000000000000000")
 
-      // }
-    });
-  }
+  //     //   // setMessage(data.returnValues[1]);
+  //     //   // setNewMessage("");
+  //     //   // setStatus("🎉 Your message has been updated!");
+
+  //     // }
+  //   // })
+  // }
 
   const onBuyPressed = async () => {
     // TODO: implement
@@ -163,11 +171,27 @@ const Minter = (props) => {
         alert('User settled price should be bigger in second sale')
         return
       }
+      console.log('State 5')
       const { status } = await buyHarberger(
         userSettledPrice,
         harbergerHike,
         harbergerTax,
       )
+
+      //first sale
+      const newOwner = (await getOwnerOfHarberger()).status
+      console.log("newOwner: ", newOwner)
+      setOwner(newOwner)
+      setDelayButtonStatus(true)
+
+
+      const newAuctionPrice =
+        parseFloat(previousAuctionPrice) * (1 + parseFloat(harbergerHike) / 100)
+      setUserSettledPrice(parseFloat(newAuctionPrice.toFixed(6)))
+
+      //second sale
+
+      console.log('satate 6')
       setStatus(status)
     }
   }
@@ -178,11 +202,11 @@ const Minter = (props) => {
       owner.toLowerCase() == walletAddress.toLowerCase() &&
       walletAddress != ''
     ) {
-      // console.log('minter.js  auctionprice ', previousAuctionPrice)
       const { status } = await delayHarberger(
         previousAuctionPrice,
         harbergerTax,
       )
+      console.log('delay executed: minter.js')
       setStatus(status)
     }
   }
@@ -200,8 +224,9 @@ const Minter = (props) => {
 
   const onChangeSettingsPressed = async () => {
     //TODO: implement
+    let temporaryValue = valueOfString
     if (issuer.toLowerCase() != owner.toLowerCase()) {
-      valueOfString = 'Current owner is not the issuer'
+      temporaryValue = 'Current owner is not the issuer'
     }
     if (
       issuer.toLowerCase() == walletAddress.toLowerCase() &&
@@ -212,7 +237,7 @@ const Minter = (props) => {
         harbergerHike,
         harbergerTax,
         initialPrice,
-        valueOfString,
+        temporaryValue,
       )
       setStatus(status)
     }
@@ -319,46 +344,54 @@ const Minter = (props) => {
           />
         )}
       </form>
-
-      {owner.toLowerCase() == walletAddress.toLowerCase() ||
-      issuer.toLowerCase() == walletAddress.toLowerCase() ||
-      walletAddress == '' ? (
+      {issuer.toLowerCase() == walletAddress.toLowerCase() &&
+      issuer.toLowerCase() != '' ? (
         <button
           id="buyButton"
           className="contractButton disabled"
           style={{ marginRight: '30px' }}
-          // onClick={onBuyPressed}
           disabled
         >
           Buy
         </button>
       ) : (
-        <button
-          id="buyButton"
-          className="contractButton"
-          style={{ marginRight: '30px' }}
-          onClick={onBuyPressed}
-        >
-          Buy
-        </button>
+        <>
+          {!delayButtonStatus ? (
+            <button
+              id="buyButton"
+              className="contractButton"
+              style={{ marginRight: '30px' }}
+              onClick={onBuyPressed}
+            >
+              Buy
+            </button>
+          ) : (
+            <button
+              id="buyButton"
+              className="contractButton disabled"
+              style={{ marginRight: '30px' }}
+              disabled
+            >
+              Buy
+            </button>
+          )}
+        </>
       )}
-      {owner.toLowerCase() == walletAddress.toLowerCase() &&
-      owner.toLowerCase() != issuer.toLowerCase() ? (
+      {!delayButtonStatus ? (
         <button
           id="delayButton"
-          className="contractButton"
+          className="contractButton disabled"
           style={{ marginRight: '30px' }}
-          onClick={onDelayPressed}
+          disabled
         >
           Delay Expire Time
         </button>
       ) : (
         <button
           id="delayButton"
-          className="contractButton disabled"
+          className="contractButton"
           style={{ marginRight: '30px' }}
-          // onClick={onDelayPressed}
-          disabled
+          onClick={onDelayPressed}
         >
           Delay Expire Time
         </button>
@@ -375,8 +408,7 @@ const Minter = (props) => {
         </button>
       ) : (
         <>
-          {owner.toLowerCase() == walletAddress.toLowerCase() &&
-          walletAddress != '' ? (
+          {delayButtonStatus ? (
             <button
               id="changeButton"
               className="contractButton"

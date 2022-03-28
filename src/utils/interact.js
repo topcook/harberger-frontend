@@ -108,8 +108,7 @@ export const buyHarberger = async (
   //getOwnerOfHarberger
   const ownerOfHarbergerAddress = await getOwnerOfHarberger()
   const issuer = await getIssuer()
-
-  let transactionParameters
+  let txHash = 'still pending'
   if (ownerOfHarbergerAddress.status == issuer.status) {
     console.log('first buy')
 
@@ -118,33 +117,36 @@ export const buyHarberger = async (
         parseFloat(userSettledPrice) +
         (parseFloat(userSettledPrice) * harbergerHike) / 100
       const amountToSend = web3.utils.toBN(parseInt(10 ** 18 * amount)) // Convert to wei value
-      web3.eth
+      console.log('state 1')
+      await web3.eth
         .sendTransaction({
           from: window.ethereum.selectedAddress,
           to: contractAddress,
           value: amountToSend,
           data: window.contract.methods
             .TransferOwnershipOfHarbergerAtFirst(
-              web3.utils.toBN(parseInt(10 ** 18 * parseFloat(userSettledPrice))),
+              web3.utils.toBN(
+                parseInt(10 ** 18 * parseFloat(userSettledPrice)),
+              ),
             )
             .encodeABI(),
         })
-        .then(function (txHash) {
-          return {
-            success: true,
-            status:
-              '✅ Check out your transaction on Etherscan: <a href="https://ropsten.etherscan.io/tx/' +
-              txHash.transactionHash +
-              '">https://ropsten.etherscan.io/tx/' +
-              txHash.transactionHash,
-          }
+        .then(function (receipt) {
+          console.log('state 2')
+          txHash =
+            '✅ Check out your transaction on Etherscan: <a href="https://ropsten.etherscan.io/tx/' +
+            receipt.transactionHash +
+            '">https://ropsten.etherscan.io/tx/' +
+            receipt.transactionHash
+          // setTimeout(() => window.location.reload(), 5000)
         })
-
+      console.log('state 3')
       return {
         success: true,
-        status: 'Pending',
+        status: txHash,
       }
     } catch (error) {
+      console.log('State 4')
       return {
         success: false,
         status: '😥 Something went wrong: ' + error.message,
@@ -152,9 +154,9 @@ export const buyHarberger = async (
     }
   } else {
     console.log('second buy')
-
+    console.log('state 11')
     try {
-      console.log("userSettable Price: ", userSettledPrice)
+      console.log('userSettable Price: ', userSettledPrice)
       let amount =
         parseFloat(userSettledPrice) +
         (parseFloat(userSettledPrice) * harbergerHike) / 100 +
@@ -162,7 +164,9 @@ export const buyHarberger = async (
       amount = amount.toFixed(7)
 
       const amountToSend = web3.utils.toBN(parseInt(10 ** 18 * amount)) // Convert to wei value
-      web3.eth
+
+      let txHash = 'still pending'
+      await web3.eth
         .sendTransaction({
           from: window.ethereum.selectedAddress,
           to: contractAddress,
@@ -173,20 +177,25 @@ export const buyHarberger = async (
             )
             .encodeABI(),
         })
-        .then(function (txHash) {
-          return {
-            success: true,
-            status:
-              '✅ Check out your transaction on Etherscan: <a href="https://ropsten.etherscan.io/tx/' +
-              txHash.transactionHash +
-              '">https://ropsten.etherscan.io/tx/' +
-              txHash.transactionHash,
-          }
+        .then(function (receipt) {
+          txHash =
+            '✅ Check out your transaction on Etherscan: <a href="https://ropsten.etherscan.io/tx/' +
+            receipt.transactionHash +
+            '">https://ropsten.etherscan.io/tx/' +
+            receipt.transactionHash
+          // return {
+          //   success: true,
+          //   status:
+          //     '✅ Check out your transaction on Etherscan: <a href="https://ropsten.etherscan.io/tx/' +
+          //     txHash +
+          //     '">https://ropsten.etherscan.io/tx/' +
+          //     txHash,
+          // }
         })
 
       return {
         success: true,
-        status: 'Pending',
+        status: txHash,
       }
     } catch (error) {
       return {
@@ -201,35 +210,41 @@ export const delayHarberger = async (previousAuctionPrice, harbergerTax) => {
   //load smart contract
   window.contract = await new web3.eth.Contract(contractABI, contractAddress) //loadContract();
 
-  let amount = parseFloat(previousAuctionPrice) * harbergerTax / 100
+  console.log("delayButton pressed")
+
+  let amount = (parseFloat(previousAuctionPrice) * harbergerTax) / 100
   amount = amount.toFixed(7)
 
+  let txHash = "pending"
   //set up your Ethereum transaction
   try {
     const amountToSend = web3.utils.toBN(parseInt(10 ** 18 * amount)) // Convert to wei value
-    web3.eth
+    await web3.eth
       .sendTransaction({
         from: window.ethereum.selectedAddress,
         to: contractAddress,
         value: amountToSend,
-        data: window.contract.methods
-          .DelayEndTimeOfOwnership()
-          .encodeABI(),
+        data: window.contract.methods.DelayEndTimeOfOwnership().encodeABI(),
       })
-      .then(function (txHash) {
+      .then(function (receipt) {
+        txHash =
+        '✅ Check out your transaction on Etherscan: <a href="https://ropsten.etherscan.io/tx/' +
+        receipt.transactionHash +
+        '">https://ropsten.etherscan.io/tx/' +
+        receipt.transactionHash
         return {
           success: true,
           status:
             '✅ Check out your transaction on Etherscan: <a href="https://ropsten.etherscan.io/tx/' +
-            txHash.transactionHash +
+            txHash +
             '">https://ropsten.etherscan.io/tx/' +
-            txHash.transactionHash,
+            txHash,
         }
       })
-
+    console.log("delay executed: interact.js")
     return {
       success: true,
-      status: 'Pending',
+      status: txHash,
     }
   } catch (error) {
     return {
@@ -304,6 +319,7 @@ export const changeSettings = async (
       method: 'eth_sendTransaction',
       params: [transactionParameters],
     })
+    console.log('between try and return')
     return {
       success: true,
       status:
